@@ -1,61 +1,34 @@
 package ui;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
-public class Form {
-    private JLabel header;
-    private JButton showFileDialogButton;
-    private JLabel fileInputLabel;
-    private JButton actionButton;
-    private JFileChooser fileDialog;
-    private JPanel panel;
+public abstract class Form {
+  protected JLabel header;
+  protected JButton actionButton;
+  protected JPanel mainPanel;
+  protected FileInput fileInput;
 
-    public Form() {
-        header = new JLabel("", JLabel.LEFT);
-        showFileDialogButton = new JButton("Choose File");
-        fileInputLabel = new JLabel("", JLabel.LEFT);
-        handleShowFileDialogButton();
-        actionButton = new JButton("");
+  public Form() {
+    header = new JLabel("", JLabel.LEFT);
+    header.setFont(header.getFont().deriveFont(24.0f));
+    header.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 
-        panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(header);
-        panel.add(fileInputLabel);
-        panel.add(showFileDialogButton);
-        panel.add(actionButton);
-    }
+    fileInput = new FileInput();
+    fileInput.getMainPanel().setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
-    public void setHeader(String text) {
-        header.setText(text);
-    }
+    actionButton = Utils.createActionButton();
+    actionButton.setAlignmentX(JButton.LEFT_ALIGNMENT);
 
-    public void setFileInputLabel(String text) {
-        fileInputLabel.setText(text);
-    }
+    mainPanel = new JPanel();
+    mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+  }
 
-    public void setActionButton(String text) {
-        actionButton.setText(text);
-    }
-
-    public void setActionButtonListener(Runnable listener) {
-        actionButton.addActionListener(e -> listener.run());
-    }
-
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    public void handleShowFileDialogButton() {
-        fileDialog = new JFileChooser();
-        showFileDialogButton.addActionListener(e -> {
-            fileDialog.setDialogTitle("Choose a file to open");
-            int returnVal = fileDialog.showOpenDialog(null);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                java.io.File file = fileDialog.getSelectedFile();
-                System.out.println("Opening: " + file.getName());
-            } else {
-                System.out.println("Open command cancelled by user.");
-            }
-        });
-    }
+  public JPanel getMainPanel() {
+    return mainPanel;
+  }
 }
