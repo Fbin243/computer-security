@@ -1,7 +1,10 @@
 package ui;
 
+import interfaces.IFileInputEvent;
+
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,10 +21,12 @@ public class FileInput {
 	private final JLabel fileInputStatusLabel;
 	private JFileChooser fileDialog;
 	private final JPanel fileInputPanel;
-
 	private final JPanel mainPanel;
+	private final IFileInputEvent fileInputEventHandler;
 
-	public FileInput() {
+	public FileInput(IFileInputEvent fileInputEventHandler) {
+		this.fileInputEventHandler = fileInputEventHandler;
+
 		fileInputLabel = new JLabel("", JLabel.LEFT);
 		fileInputLabel.setFont(fileInputLabel.getFont().deriveFont(15.0f));
 		fileInputLabel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
@@ -61,8 +66,12 @@ public class FileInput {
 			fileDialog.setDialogTitle("Choose a file to open");
 			int returnVal = fileDialog.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				java.io.File file = fileDialog.getSelectedFile();
+				File file = fileDialog.getSelectedFile();
 				fileInputStatusLabel.setText(file.getName());
+
+				if (fileInputEventHandler != null) {
+					fileInputEventHandler.onItemClick(file);
+				}
 			} else {
 				fileInputStatusLabel.setText("No File Chosen");
 			}
