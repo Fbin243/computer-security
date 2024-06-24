@@ -1,11 +1,14 @@
 package logic;
 
-import constants.Algorithm;
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import constants.Algorithm;
 
 public class AES {
     private static final String ALGORITHM = Algorithm.AES;
@@ -21,7 +24,7 @@ public class AES {
         cipher.init(cipherMode, secretKey);
 
         try (FileInputStream inputStream = new FileInputStream(inputFile);
-             FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                FileOutputStream outputStream = new FileOutputStream(outputFile)) {
 
             byte[] inputBytes = new byte[(int) inputStream.available()];
             inputStream.read(inputBytes);
