@@ -31,10 +31,9 @@ public class RSA {
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
-    public String decrypt(String ciphertext, String privateKeyStr) throws Exception {
-        PrivateKey privateKey = loadPrivateKeyFromString(privateKeyStr);
+    public String decrypt(String ciphertext) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        cipher.init(Cipher.DECRYPT_MODE, this.privateKey);
         byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
         return new String(decryptedBytes);
     }
@@ -47,11 +46,11 @@ public class RSA {
         return Base64.getEncoder().encodeToString(this.publicKey.getEncoded());
     }
 
-    private PrivateKey loadPrivateKeyFromString(String key) throws Exception {
+    public void loadPrivateKeyFromString(String key) throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePrivate(spec);
+        this.privateKey = keyFactory.generatePrivate(spec);
     }
 
     public void loadPublicKey(String key) throws Exception {
