@@ -1,6 +1,7 @@
 package utils;
 
 import java.security.SecureRandom;
+import java.util.UUID;
 
 public class FileGenerator {
     public static String generateDecryptedFileName(String inputFile, String fileMode) {
@@ -17,5 +18,10 @@ public class FileGenerator {
             sb.append(characters.charAt(random.nextInt(characters.length())));
         }
         return sb.toString();
+    }
+
+    public static String generateUniqueString() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
     }
 }
