@@ -59,10 +59,11 @@ public class DecryptForm extends Form {
             // String aesKey = rsa.decrypt(encryptedAesKey);
 
             // Decrypt the file using AES - Tuan
-			String aseKey = "XL50oiUezGtMu81SY/AjPw==";
 			AES aes = new AES();
-			String fileP = aes.decrypt(aseKey, selectedFileForm.getAbsolutePath());
-			System.out.println("Decryption successful. " + fileP);
+			aes.decrypt2("hKDHl3bTmOseojw07o98zQ==",
+					getDesktopDirectory() + "115566e5-c7ce-49f1-8d5a-b5c705950cef.aes");
+//			System.out.println("Decryption successful. " + fileP);
+//			kmr/l6ZRW7cmNx9wMuojLH8zf
 
 
         } catch (Exception ex) {
