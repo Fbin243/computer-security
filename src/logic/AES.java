@@ -26,6 +26,15 @@ public class AES {
         return handleCrypto(Cipher.ENCRYPT_MODE, key, inputFile);
     }
 
+    public void decrypt(String key, String inputFile, String outputFile) throws Exception {
+        String decrypted = handleCrypto(Cipher.DECRYPT_MODE, key, inputFile);
+        try (FileOutputStream outputStream = new FileOutputStream(getDesktopDirectory() + outputFile)) {
+            outputStream.write(Base64.getDecoder().decode(decrypted));
+        } catch (IOException ex) {
+            throw new RuntimeException("Error during file AES decryption", ex);
+        }
+    }
+
     private String handleCrypto(int cipherMode, String key, String inputFile) throws Exception {
         SecretKey secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -40,7 +49,7 @@ public class AES {
 
             return Base64.getEncoder().encodeToString(outputBytes);
         } catch (IOException ex) {
-            throw new RuntimeException("Error during file AES encryption", ex);
+            throw new RuntimeException("Error during AES crypto", ex);
         }
     }
 
@@ -62,5 +71,10 @@ public class AES {
 
     public String getAesKey() {
         return aesKey;
+    }
+
+    private String getDesktopDirectory() {
+        String home = System.getProperty("user.home");
+        return home + "/Desktop/";
     }
 }

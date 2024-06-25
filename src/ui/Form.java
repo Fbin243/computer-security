@@ -24,6 +24,10 @@ public abstract class Form {
     fileInput = new FileInput();
     fileInput.getMainPanel().setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
+    fileInput.setFileInputEventHandler((File file) -> {
+      selectedFileForm = file;
+    });
+
     actionButton = Utils.createActionButton();
     actionButton.setAlignmentX(JButton.LEFT_ALIGNMENT);
 

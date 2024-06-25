@@ -19,9 +19,6 @@ public class EncryptForm extends Form {
 
         header.setText("File Encryption");
         fileInput.setFileInputLabel("Upload File to Encrypt");
-        fileInput.setFileInputEventHandler((file) -> {
-            selectedFileForm = file;
-        });
 
         actionButton.setText("Encrypt");
         actionButton.addActionListener(e -> handleEncrypt());
@@ -54,7 +51,8 @@ public class EncryptForm extends Form {
             // Step 2: AES encrypt file with Ks to get file C and save to ./user
             String hashedAESKey = aes.encrypt(aes.getAesKey(), inputFile);
             bw.write(hashedAESKey);
-            System.out.println("File encrypted successfully.");
+            System.out.println("Ks key: " + aes.getAesKey());
+            System.out.println("AES Key encrypted successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -66,7 +64,7 @@ public class EncryptForm extends Form {
 
             // Step 4: RSA encrypt Ks with public key to get Kx
             String encryptedAesKey = rsa.encrypt(aes.getAesKey());
-            System.out.println("AES Key encrypted successfully");
+            System.out.println("AES Key encrypted by RSA successfully");
             System.out.println("Encrypted AES Key (Kx): " + encryptedAesKey);
 
             // Step 5: SHA hash private key and save with Kx to ./system
