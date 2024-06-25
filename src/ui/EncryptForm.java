@@ -41,9 +41,9 @@ public class EncryptForm extends Form {
         }
 
         String inputFile = selectedFileForm.getAbsolutePath();
-        String aesCFile = FileGenerator.generateUniqueString() + "-C.txt";
-        String kPrivateKFile = FileGenerator.generateUniqueString() + "-K.txt";
-        String systemMetadataFileName = FileGenerator.generateUniqueString() + ".metadata";
+        String aesCFile = FileGenerator.generateUniqueString() + Common.C_FILE_EXTENSION;
+        String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_FILE_EXTENSION;
+        String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
 
         // Step 1: AES generate key Ks
         String aesKey = AlgorithmGeneratorUtils.generateSymmetryKey(Algorithm.AES, 128); // Ks
