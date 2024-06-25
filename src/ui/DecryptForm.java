@@ -47,9 +47,9 @@ public class DecryptForm extends Form {
 
         try {
 			// Load the private key
-            String privateKey = new String(Files.readAllBytes(Paths.get(privateKeySelectedFile.getAbsolutePath())));
-            RSA rsa = new RSA();
-            rsa.loadPrivateKeyFromString(privateKey);
+            // String privateKey = new String(Files.readAllBytes(Paths.get(privateKeySelectedFile.getAbsolutePath())));
+            // RSA rsa = new RSA();
+            // rsa.loadPrivateKeyFromString(privateKey);
 
             // Compare SHA-1 and HKprivate - Binh
 
