@@ -30,22 +30,26 @@ public class DecryptForm extends Form {
         actionButton.setText("Decrypt");
         actionButton.addActionListener(e -> handleDecrypt());
 
-        mainPanel.add(header);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        mainPanel.add(fileInput.getMainPanel());
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-        mainPanel.add(fileInputPrivateKey.getMainPanel());
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-        mainPanel.add(actionButton);
-    }
+		mainPanel.add(header);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+		mainPanel.add(fileInput.getMainPanel());
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+		mainPanel.add(fileInputPrivateKey.getMainPanel());
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+		mainPanel.add(actionButton);
+	}
 
-    private void handleDecrypt() {
-		// if (privateKeySelectedFile == null || super.selectedFileForm == null) {
-		// 	System.out.println("Please select decrypt file and key private file.");
-		// 	return;
-		// }
+	private void handleDecrypt() {
+		if (selectedFileForm == null || privateKeySelectedFile == null) {
+            System.out.println("Please select both a file to decrypt and a private key file.");
+            return;
+        }
 
         try {
+			// Load the private key
+            String privateKey = new String(Files.readAllBytes(Paths.get(privateKeySelectedFile.getAbsolutePath())));
+            RSA rsa = new RSA();
+            rsa.loadPrivateKeyFromString(privateKey);
 
             // Compare SHA-1 and HKprivate - Binh
 
