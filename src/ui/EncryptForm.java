@@ -11,7 +11,6 @@ import constants.Common;
 import logic.AES;
 import logic.RSA;
 import logic.SHA;
-import utils.AlgorithmGeneratorUtils;
 import utils.FileGenerator;
 
 public class EncryptForm extends Form {
@@ -20,6 +19,7 @@ public class EncryptForm extends Form {
 
         header.setText("File Encryption");
         fileInput.setFileInputLabel("Upload File to Encrypt");
+
         actionButton.setText("Encrypt");
         actionButton.addActionListener(e -> handleEncrypt());
 
@@ -31,37 +31,56 @@ public class EncryptForm extends Form {
     }
 
     public void handleEncrypt() {
-        String key = AlgorithmGeneratorUtils.generateSymmetryKey(Algorithm.AES, 128);
+        if (selectedFileForm == null) {
+            System.out.println("Please select a file to encrypt.");
+            return;
+        }
+
         String inputFile = selectedFileForm.getAbsolutePath();
-        String encryptedFile = FileGenerator.generateDecryptedFileName(inputFile, Common.ENCRYPTED);
-        String systemMetadataFileName = FileGenerator.generateUniqueString() + ".metadata";
+        String aesCFile = FileGenerator.generateUniqueString() + Common.AES_FILE_EXTENSION;
+        String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_PRIVATE_FILE_EXTENSION;
+        String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
+
+        // Step 1: AES generate key Ks
+        AES aes = new AES();
+        RSA rsa = new RSA();
+        SHA sha = new SHA(Algorithm.SHA1);
 
         try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.SYSTEM_PATH + systemMetadataFileName, false));) {
-            // Step 1: AES generate key Ks
-            // Need to generate AES key right here .......
-
+                new FileWriter(Common.USER_PATH + aesCFile, false))){
             // Step 2: AES encrypt file with Ks to get file C and save to ./user
-            AES.encrypt(key, inputFile, encryptedFile);
-            System.out.println("File encrypted successfully.");
+            String hashedAESKey = aes.encrypt(aes.getAesKey(), inputFile);
+            bw.write(hashedAESKey);
+            System.out.println("Ks key: " + aes.getAesKey());
+            System.out.println("AES Key encrypted successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
+        try (BufferedWriter bw = new BufferedWriter(
+                new FileWriter(Common.SYSTEM_PATH + systemMetadataFileName, false))) {
             // Step 3: RSA generate key pair
-            RSA rsa = new RSA();
             rsa.generateKeys();
 
             // Step 4: RSA encrypt Ks with public key to get Kx
-            String encryptedAesKey = rsa.encrypt(key);
-            System.out.println("AES Key encrypted successfully");
+            String encryptedAesKey = rsa.encrypt(aes.getAesKey());
+            System.out.println("AES Key encrypted by RSA successfully");
             System.out.println("Encrypted AES Key (Kx): " + encryptedAesKey);
 
             // Step 5: SHA hash private key and save with Kx to ./system
-            SHA sha = new SHA(Algorithm.SHA1);
             String hashedPrivateKey = sha.hash(rsa.getPrivateKey());
             System.out.println("Private key hashed successfully");
             System.out.println("Hashed Private Key: " + hashedPrivateKey);
             bw.write(hashedPrivateKey + "\n" + encryptedAesKey);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-            // Step 5: Save private key to ./user
+        try (BufferedWriter bw = new BufferedWriter(
+                new FileWriter(Common.USER_PATH + kPrivateKFile, false))){
+            // Step 6: Save private key to ./user
+            bw.write(rsa.getPrivateKey());
+            System.out.println("File K-private stored.");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

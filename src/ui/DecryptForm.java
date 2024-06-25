@@ -16,18 +16,20 @@ import constants.Common;
 
 public class DecryptForm extends Form {
 	private final FileInput fileInputPrivateKey;
-	private File selectedFileForm;
+	private File privateKeySelectedFile;
 
 	public DecryptForm() {
 		super();
 
 		header.setText("File Decryption");
 		fileInput.setFileInputLabel("Upload File to Decrypt");
-		fileInputPrivateKey = new FileInput(file -> {
-			selectedFileForm = file;
-			System.out.println("Private key file: " + file.getAbsolutePath());
-		});
+		fileInputPrivateKey = new FileInput();
 		fileInputPrivateKey.setFileInputLabel("Upload File Private Key");
+
+		fileInputPrivateKey.setFileInputEventHandler((File file) -> {
+			privateKeySelectedFile = file;
+		});
+
 		actionButton.setText("Decrypt");
 		actionButton.addActionListener(e -> handleDecrypt());
 
@@ -41,6 +43,8 @@ public class DecryptForm extends Form {
 	}
 
 	private void handleDecrypt() {
+
+
         try {
 
 			// Compare SHA-1 and HKprivate - Binh
@@ -52,6 +56,11 @@ public class DecryptForm extends Form {
             // String aesKey = rsa.decrypt(encryptedAesKey);
 
             // Decrypt the file using AES - Tuan
+			String aseKey = "678z2MlNaPjJDRMk/eZV+w==";
+			AES aes = new AES();
+			aes.decrypt(aseKey, selectedFileForm.getAbsolutePath(), "decrypted_" + selectedFileForm.getName());
+			System.out.println("Decryption successful.");
+
 
         } catch (Exception ex) {
             ex.printStackTrace();

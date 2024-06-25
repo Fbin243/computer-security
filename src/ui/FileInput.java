@@ -22,10 +22,9 @@ public class FileInput {
 	private JFileChooser fileDialog;
 	private final JPanel fileInputPanel;
 	private final JPanel mainPanel;
-	private final IFileInputEvent fileInputEventHandler;
+	private IFileInputEvent fileInputEventHandler;
 
-	public FileInput(IFileInputEvent fileInputEventHandler) {
-		this.fileInputEventHandler = fileInputEventHandler;
+	public FileInput() {
 
 		fileInputLabel = new JLabel("", JLabel.LEFT);
 		fileInputLabel.setFont(fileInputLabel.getFont().deriveFont(15.0f));
@@ -54,6 +53,10 @@ public class FileInput {
 
 	public void setFileInputLabel(String text) {
 		fileInputLabel.setText(text);
+	}
+
+	public void setFileInputEventHandler(IFileInputEvent fileInputEventHandler) {
+		this.fileInputEventHandler = fileInputEventHandler;
 	}
 
 	public JPanel getMainPanel() {
