@@ -3,6 +3,8 @@ package logic;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -14,26 +16,25 @@ public class AES {
     private static final String ALGORITHM = Algorithm.AES;
     private static final String TRANSFORMATION = Algorithm.AES;
 
-    public static void encrypt(String key, String inputFile, String outputFile) throws Exception {
-        doCrypto(Cipher.ENCRYPT_MODE, key, inputFile, outputFile);
+    public String encrypt(String key, String inputFile) throws Exception {
+        return handleCrypto(Cipher.ENCRYPT_MODE, key, inputFile);
     }
 
-    private static void doCrypto(int cipherMode, String key, String inputFile, String outputFile) throws Exception {
+    private String handleCrypto(int cipherMode, String key, String inputFile) throws Exception {
         SecretKey secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(cipherMode, secretKey);
 
-        try (FileInputStream inputStream = new FileInputStream(inputFile);
-                FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+        try (FileInputStream inputStream = new FileInputStream(inputFile)) {
 
             byte[] inputBytes = new byte[(int) inputStream.available()];
             inputStream.read(inputBytes);
 
             byte[] outputBytes = cipher.doFinal(inputBytes);
 
-            outputStream.write(outputBytes);
+            return Base64.getEncoder().encodeToString(outputBytes);
         } catch (IOException ex) {
-            throw new RuntimeException("Error during file encryption", ex);
+            throw new RuntimeException("Error during file AES encryption", ex);
         }
     }
 }

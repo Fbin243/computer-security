@@ -21,9 +21,7 @@ public abstract class Form {
     header.setFont(header.getFont().deriveFont(24.0f));
     header.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 
-    fileInput = new FileInput(file -> {
-      selectedFileForm = file;
-    });
+    fileInput = new FileInput();
     fileInput.getMainPanel().setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
     actionButton = Utils.createActionButton();

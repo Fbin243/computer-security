@@ -23,11 +23,17 @@ public class DecryptForm extends Form {
 
 		header.setText("File Decryption");
 		fileInput.setFileInputLabel("Upload File to Decrypt");
-		fileInputPrivateKey = new FileInput(file -> {
-			selectedFileForm = file;
-			System.out.println("Private key file: " + file.getAbsolutePath());
-		});
+		fileInputPrivateKey = new FileInput();
 		fileInputPrivateKey.setFileInputLabel("Upload File Private Key");
+
+		fileInput.setFileInputEventHandler((File file) -> {
+			selectedFileForm = file;
+		});
+
+		fileInputPrivateKey.setFileInputEventHandler((File file) -> {
+			selectedFileForm = file;
+		});
+
 		actionButton.setText("Decrypt");
 		actionButton.addActionListener(e -> handleDecrypt());
 

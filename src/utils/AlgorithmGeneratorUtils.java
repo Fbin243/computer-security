@@ -5,9 +5,6 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 
 public class AlgorithmGeneratorUtils {
-    public static String generateSymmetryKey(String algorithm) {
-        return generateSymmetryKey(algorithm, 256);
-    }
     public static String generateSymmetryKey(String algorithm, int keySize) {
         try {
             // Create a KeyGenerator for AES
