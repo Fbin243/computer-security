@@ -43,7 +43,10 @@ public class DecryptForm extends Form {
 	}
 
 	private void handleDecrypt() {
-
+//		if (privateKeySelectedFile == null || super.selectedFileForm == null) {
+//			System.out.println("Please select decrypt file and key private file.");
+//			return;
+//		}
 
         try {
 
@@ -56,10 +59,10 @@ public class DecryptForm extends Form {
             // String aesKey = rsa.decrypt(encryptedAesKey);
 
             // Decrypt the file using AES - Tuan
-			String aseKey = "678z2MlNaPjJDRMk/eZV+w==";
+			String aseKey = "XL50oiUezGtMu81SY/AjPw==";
 			AES aes = new AES();
-			aes.decrypt(aseKey, selectedFileForm.getAbsolutePath(), "decrypted_" + selectedFileForm.getName());
-			System.out.println("Decryption successful.");
+			String fileP = aes.decrypt(aseKey, selectedFileForm.getAbsolutePath());
+			System.out.println("Decryption successful. " + fileP);
 
 
         } catch (Exception ex) {
@@ -67,4 +70,9 @@ public class DecryptForm extends Form {
             System.out.println("Decryption failed.");
         }
     }
+
+	private String getDesktopDirectory() {
+		String home = System.getProperty("user.home");
+		return home + "/Desktop/";
+	}
 }

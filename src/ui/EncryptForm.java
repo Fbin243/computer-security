@@ -47,9 +47,9 @@ public class EncryptForm extends Form {
         SHA sha = new SHA(Algorithm.SHA1);
 
         try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.USER_PATH + aesCFile, false))){
+                new FileWriter(Common.USER_PATH + aesCFile, false))) {
             // Step 2: AES encrypt file with Ks to get file C and save to ./user
-            String hashedAESKey = aes.encrypt(aes.getAesKey(), inputFile);
+            String hashedAESKey = aes.encrypt(inputFile);
             bw.write(hashedAESKey);
             System.out.println("Ks key: " + aes.getAesKey());
             System.out.println("AES Key encrypted successfully.");
@@ -77,7 +77,7 @@ public class EncryptForm extends Form {
         }
 
         try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.USER_PATH + kPrivateKFile, false))){
+                new FileWriter(Common.USER_PATH + kPrivateKFile, false))) {
             // Step 6: Save private key to ./user
             bw.write(rsa.getPrivateKey());
             System.out.println("File K-private stored.");
