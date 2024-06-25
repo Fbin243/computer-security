@@ -11,7 +11,6 @@ import constants.Common;
 import logic.AES;
 import logic.RSA;
 import logic.SHA;
-import utils.AlgorithmGeneratorUtils;
 import utils.FileGenerator;
 
 public class EncryptForm extends Form {
@@ -41,12 +40,11 @@ public class EncryptForm extends Form {
         }
 
         String inputFile = selectedFileForm.getAbsolutePath();
-        String aesCFile = FileGenerator.generateUniqueString() + Common.C_FILE_EXTENSION;
-        String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_FILE_EXTENSION;
+        String aesCFile = FileGenerator.generateUniqueString() + Common.AES_FILE_EXTENSION;
+        String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_PRIVATE_FILE_EXTENSION;
         String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
 
         // Step 1: AES generate key Ks
-        String aesKey = AlgorithmGeneratorUtils.generateSymmetryKey(Algorithm.AES, 128); // Ks
         AES aes = new AES();
         RSA rsa = new RSA();
         SHA sha = new SHA(Algorithm.SHA1);
@@ -54,7 +52,7 @@ public class EncryptForm extends Form {
         try (BufferedWriter bw = new BufferedWriter(
                 new FileWriter(Common.USER_PATH + aesCFile, false))){
             // Step 2: AES encrypt file with Ks to get file C and save to ./user
-            String hashedAESKey = aes.encrypt(aesKey, inputFile);
+            String hashedAESKey = aes.encrypt(aes.getAesKey(), inputFile);
             bw.write(hashedAESKey);
             System.out.println("File encrypted successfully.");
         } catch (Exception ex) {
@@ -67,7 +65,7 @@ public class EncryptForm extends Form {
             rsa.generateKeys();
 
             // Step 4: RSA encrypt Ks with public key to get Kx
-            String encryptedAesKey = rsa.encrypt(aesKey);
+            String encryptedAesKey = rsa.encrypt(aes.getAesKey());
             System.out.println("AES Key encrypted successfully");
             System.out.println("Encrypted AES Key (Kx): " + encryptedAesKey);
 
@@ -84,7 +82,7 @@ public class EncryptForm extends Form {
                 new FileWriter(Common.USER_PATH + kPrivateKFile, false))){
             // Step 6: Save private key to ./user
             bw.write(rsa.getPrivateKey());
-            System.out.println("File K stored.");
+            System.out.println("File K-private stored.");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

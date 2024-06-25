@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -15,6 +16,11 @@ import constants.Algorithm;
 public class AES {
     private static final String ALGORITHM = Algorithm.AES;
     private static final String TRANSFORMATION = Algorithm.AES;
+    private final String aesKey;
+
+    public AES() {
+        this.aesKey = generateSymmetryKey(ALGORITHM, 128);
+    }
 
     public String encrypt(String key, String inputFile) throws Exception {
         return handleCrypto(Cipher.ENCRYPT_MODE, key, inputFile);
@@ -36,5 +42,25 @@ public class AES {
         } catch (IOException ex) {
             throw new RuntimeException("Error during file AES encryption", ex);
         }
+    }
+
+    public static String generateSymmetryKey(String algorithm, int keySize) {
+        try {
+            // Create a KeyGenerator for AES
+            KeyGenerator keyGen = KeyGenerator.getInstance(algorithm);
+            keyGen.init(keySize);
+            SecretKey secretKey = keyGen.generateKey();
+
+            // Encode the key to a string format
+            String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+            return encodedKey;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error generating key!";
+        }
+    }
+
+    public String getAesKey() {
+        return aesKey;
     }
 }
