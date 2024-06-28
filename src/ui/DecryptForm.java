@@ -10,6 +10,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class DecryptForm extends Form {
     private final FileInput fileInputPrivateKey;
@@ -40,10 +43,10 @@ public class DecryptForm extends Form {
 	}
 
 	private void handleDecrypt() {
-		if (selectedFileForm == null || privateKeySelectedFile == null) {
-            System.out.println("Please select both a file to decrypt and a private key file.");
-            return;
-        }
+		// if (selectedFileForm == null || privateKeySelectedFile == null) {
+        //     System.out.println("Please select both a file to decrypt and a private key file.");
+        //     return;
+        // }
 
         try {
 			// Load the private key
@@ -66,20 +69,22 @@ public class DecryptForm extends Form {
         // Decrypt the file using AES - Tuan
         try {
             AES aes = new AES();
-            String plainText = aes.decrypt("I76jiti1+82ZOif9ip7khQ==",
+            byte[] decryptedBytes = aes.decrypt("V5+Mi8gtDOBNDDuGd0/jaw==",
                     super.selectedFileForm.getAbsolutePath());
 
             String exportedFileName = Common.USER_PATH +
                     Common.DECRYPTED_SUB_NAME
                     + Helpers.getFileName(super.selectedFileForm.getName()) + "." + aes.getFileExtension();
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(exportedFileName))) {
-                bw.write(plainText);
-                System.out.println("Decryption successful.");
-            } catch (IOException internalEx) {
-                internalEx.printStackTrace();
-                throw new IOException("Error during file export", internalEx);
-            }
+            Files.write(Paths.get(exportedFileName), decryptedBytes, StandardOpenOption.CREATE);
+
+            // try (BufferedWriter bw = new BufferedWriter(new FileWriter(exportedFileName))) {
+            //     bw.write(plainText);
+            //     System.out.println("Decryption successful.");
+            // } catch (IOException internalEx) {
+            //     internalEx.printStackTrace();
+            //     throw new IOException("Error during file export", internalEx);
+            // }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Decryption failed.");

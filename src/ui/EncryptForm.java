@@ -3,6 +3,10 @@ package ui;
 import java.awt.Dimension;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.swing.Box;
 
@@ -47,16 +51,22 @@ public class EncryptForm extends Form {
         RSA rsa = new RSA();
         SHA sha = new SHA(Algorithm.SHA1);
 
-        try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.USER_PATH + aesCFile, false))) {
-            // Step 2: AES encrypt file with Ks to get file C and save to ./user
-            String hashedAESKey = aes.encrypt(inputFile);
-            bw.write(Helpers.getFileExtension(inputFile) + "\n");
-            bw.write(hashedAESKey);
+        try {
+            byte[] hashedAESKey = aes.encrypt(inputFile);
+            Path outputPath = Paths.get(Common.USER_PATH + aesCFile);
+
+            // bw.write(Helpers.getFileExtension(inputFile) + "\n");
+            // Files.write(outputPath, Helpers.getFileExtension(inputFile) + "\n", StandardOpenOption.CREATE);
+            // try (BufferedWriter bw = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE)) {
+            //     bw.write(Helpers.getFileExtension(inputFile) + "\n");
+            // }
+            Files.write(outputPath, hashedAESKey, StandardOpenOption.CREATE);
+
+            // bw.write(hashedAESKey);
+
             System.out.println("Ks key: " + aes.getAesKey());
             System.out.println("File: " + aesCFile);
             System.out.println("AES Key encrypted successfully.");
-
 
         } catch (Exception ex) {
             ex.printStackTrace();

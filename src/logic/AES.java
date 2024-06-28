@@ -16,31 +16,36 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 public class AES {
-    private String fileExtension = "";
+    private String fileExtension = "pdf";
     private final SecretKey aesKey;
 
     public AES() {
         this.aesKey = generateKsKey(128);
     }
 
-    public String encrypt(String inputFile) throws Exception {
+    public byte[] encrypt(String inputFile) throws Exception {
         Cipher cipher = Cipher.getInstance(Algorithm.AES);
         cipher.init(Cipher.ENCRYPT_MODE, this.aesKey);
 
         try {
-            String plainText = new String(Files.readAllBytes(Paths.get(inputFile)));
+            // String plainText = new String(Files.readAllBytes(Paths.get(inputFile)));
+            //
+            // byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+            byte[] fileBytes = Files.readAllBytes(Paths.get(inputFile));
 
-            byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+            byte[] cipherBytes = cipher.doFinal(fileBytes);
 
-            return Base64.getEncoder().encodeToString(cipherText);
+            // return Base64.getEncoder().encodeToString(cipherText);
+            return cipherBytes;
         } catch (IOException ex) {
             throw new RuntimeException("Error during AES crypto", ex);
         }
     }
 
-    public String decrypt(String KsKey, String inputFile) throws Exception {
+    public byte[] decrypt(String KsKey, String inputFile) throws Exception {
         Path path = Paths.get(inputFile);
 
         if (!Files.exists(path)) {
@@ -50,28 +55,52 @@ public class AES {
         SecretKey secretKey = convertStringToSecretKey(KsKey);
         Cipher cipher = Cipher.getInstance(Algorithm.AES);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        String cipherText;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
-            fileExtension = br.readLine();
-            cipherText = br.readLine();
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        byte[] decodedBytes = Files.readAllBytes(path);
 
-            return new String(decryptedBytes);
-        } catch (IOException ex) {
-            throw new RuntimeException("Error during AES crypto", ex);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error during decryption", ex);
-        }
-        // try {
-        //     String cipherText = new String(Files.readAllBytes(path));
-        //     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-        //
-        //     return new String(decryptedBytes);
-        // } catch (IOException ex) {
-        //     throw new RuntimeException("Error during AES crypto", ex);
-        // }
+        byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+
+        return decryptedBytes;
     }
+
+    // List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+
+    // String cipherText;
+
+    // byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
+
+    // if (lines.size() < 2) {
+    //     throw new RuntimeException("File format is incorrect. Expected at least two lines.");
+    // }
+
+    // fileExtension = lines.get(0); // Read the file extension (first line)
+    // System.out.println("File extension: " + fileExtension);
+    // String cipherText = lines.get(1);    // Read the encrypted data (second line)
+
+
+    // try {
+    //     byte[] cipherBytes = Files.readAllBytes(path);
+    //     byte[] decodedBytes = Base64.getDecoder().decode(cipherBytes);
+    //     byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+    //
+    //     return decryptedBytes;
+    // } catch (IOException ex) {
+    //     throw new RuntimeException("Error during AES crypto", ex);
+    // } catch (Exception ex) {
+    //     throw new RuntimeException("Error during decryption", ex);
+    // }
+
+    // try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+    //     fileExtension = br.readLine();
+    //     cipherText = br.readLine();
+    //     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+    //
+    //     return new String(decryptedBytes);
+    // } catch (IOException ex) {
+    //     throw new RuntimeException("Error during AES crypto", ex);
+    // } catch (Exception ex) {
+    //     throw new RuntimeException("Error during decryption", ex);
+    // }
 
     public SecretKey generateKsKey(int keySize) {
         try {
