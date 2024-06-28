@@ -1,37 +1,34 @@
 package ui;
 
-import interfaces.IFileInputEvent;
-import logic.AES;
-import logic.RSA;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.swing.Box;
-
 import constants.Common;
+import logic.AES;
+import utils.Helpers;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class DecryptForm extends Form {
-	private final FileInput fileInputPrivateKey;
-	private File privateKeySelectedFile;
+    private final FileInput fileInputPrivateKey;
+    private File privateKeySelectedFile;
 
-	public DecryptForm() {
-		super();
+    public DecryptForm() {
+        super();
 
-		header.setText("File Decryption");
-		fileInput.setFileInputLabel("Upload File to Decrypt");
-		fileInputPrivateKey = new FileInput();
-		fileInputPrivateKey.setFileInputLabel("Upload File Private Key");
+        header.setText("File Decryption");
+        fileInput.setFileInputLabel("Upload File to Decrypt");
+        fileInputPrivateKey = new FileInput();
+        fileInputPrivateKey.setFileInputLabel("Upload File Private Key");
 
-		fileInputPrivateKey.setFileInputEventHandler((File file) -> {
-			privateKeySelectedFile = file;
-		});
+        fileInputPrivateKey.setFileInputEventHandler((File file) -> {
+            privateKeySelectedFile = file;
+        });
 
-		actionButton.setText("Decrypt");
-		actionButton.addActionListener(e -> handleDecrypt());
+        actionButton.setText("Decrypt");
+        actionButton.addActionListener(e -> handleDecrypt());
 
 		mainPanel.add(header);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
@@ -50,25 +47,44 @@ public class DecryptForm extends Form {
 
         try {
 			// Load the private key
-            String privateKey = new String(Files.readAllBytes(Paths.get(privateKeySelectedFile.getAbsolutePath())));
-            RSA rsa = new RSA();
-            rsa.loadPrivateKeyFromString(privateKey);
+            // String privateKey = new String(Files.readAllBytes(Paths.get(privateKeySelectedFile.getAbsolutePath())));
+            // RSA rsa = new RSA();
+            // rsa.loadPrivateKeyFromString(privateKey);
 
-			// Compare SHA-1 and HKprivate - Binh
-           
-			// Decrypt the AES key
+            // Compare SHA-1 and HKprivate - Binh
+
+            // If SHA-1 == HKprivate then
+            // Decrypt the AES key
+            // RSA rsa = new RSA();
+            // rsa.loadPrivateKeyFromString(privateKey);
             // String aesKey = rsa.decrypt(encryptedAesKey);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Decryption failed.");
+        }
 
-            // Decrypt the file using AES - Tuan
-			String aseKey = "678z2MlNaPjJDRMk/eZV+w==";
-			AES aes = new AES();
-			aes.decrypt(aseKey, selectedFileForm.getAbsolutePath(), "decrypted_" + selectedFileForm.getName());
-			System.out.println("Decryption successful.");
+        // Decrypt the file using AES - Tuan
+        try {
+            AES aes = new AES();
+            String plainText = aes.decrypt("I76jiti1+82ZOif9ip7khQ==",
+                    super.selectedFileForm.getAbsolutePath());
 
+            String exportedFileName = Common.USER_PATH +
+                    Common.DECRYPTED_SUB_NAME
+                    + Helpers.getFileName(super.selectedFileForm.getName()) + "." + aes.getFileExtension();
 
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(exportedFileName))) {
+                bw.write(plainText);
+                System.out.println("Decryption successful.");
+            } catch (IOException internalEx) {
+                internalEx.printStackTrace();
+                throw new IOException("Error during file export", internalEx);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Decryption failed.");
         }
     }
+
+
 }

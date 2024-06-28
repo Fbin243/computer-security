@@ -1,80 +1,99 @@
 package logic;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Base64;
+import constants.Algorithm;
+import utils.FileGenerator;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import constants.Algorithm;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Base64;
 
 public class AES {
-    private static final String ALGORITHM = Algorithm.AES;
-    private static final String TRANSFORMATION = Algorithm.AES;
-    private final String aesKey;
+    private String fileExtension = "";
+    private final SecretKey aesKey;
 
     public AES() {
-        this.aesKey = generateSymmetryKey(ALGORITHM, 128);
+        this.aesKey = generateKsKey(128);
     }
 
-    public String encrypt(String key, String inputFile) throws Exception {
-        return handleCrypto(Cipher.ENCRYPT_MODE, key, inputFile);
-    }
+    public String encrypt(String inputFile) throws Exception {
+        Cipher cipher = Cipher.getInstance(Algorithm.AES);
+        cipher.init(Cipher.ENCRYPT_MODE, this.aesKey);
 
-    public void decrypt(String key, String inputFile, String outputFile) throws Exception {
-        String decrypted = handleCrypto(Cipher.DECRYPT_MODE, key, inputFile);
-        try (FileOutputStream outputStream = new FileOutputStream(getDesktopDirectory() + outputFile)) {
-            outputStream.write(Base64.getDecoder().decode(decrypted));
-        } catch (IOException ex) {
-            throw new RuntimeException("Error during file AES decryption", ex);
-        }
-    }
+        try {
+            String plainText = new String(Files.readAllBytes(Paths.get(inputFile)));
 
-    private String handleCrypto(int cipherMode, String key, String inputFile) throws Exception {
-        SecretKey secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        cipher.init(cipherMode, secretKey);
+            byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
-        try (FileInputStream inputStream = new FileInputStream(inputFile)) {
-
-            byte[] inputBytes = new byte[(int) inputStream.available()];
-            inputStream.read(inputBytes);
-
-            byte[] outputBytes = cipher.doFinal(inputBytes);
-
-            return Base64.getEncoder().encodeToString(outputBytes);
+            return Base64.getEncoder().encodeToString(cipherText);
         } catch (IOException ex) {
             throw new RuntimeException("Error during AES crypto", ex);
         }
     }
 
-    public static String generateSymmetryKey(String algorithm, int keySize) {
+    public String decrypt(String KsKey, String inputFile) throws Exception {
+        Path path = Paths.get(inputFile);
+
+        if (!Files.exists(path)) {
+            throw new RuntimeException("File not found: " + inputFile);
+        }
+
+        SecretKey secretKey = convertStringToSecretKey(KsKey);
+        Cipher cipher = Cipher.getInstance(Algorithm.AES);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        String cipherText;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+            fileExtension = br.readLine();
+            cipherText = br.readLine();
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+
+            return new String(decryptedBytes);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error during AES crypto", ex);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error during decryption", ex);
+        }
+        // try {
+        //     String cipherText = new String(Files.readAllBytes(path));
+        //     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        //
+        //     return new String(decryptedBytes);
+        // } catch (IOException ex) {
+        //     throw new RuntimeException("Error during AES crypto", ex);
+        // }
+    }
+
+    public SecretKey generateKsKey(int keySize) {
         try {
-            // Create a KeyGenerator for AES
-            KeyGenerator keyGen = KeyGenerator.getInstance(algorithm);
+            KeyGenerator keyGen = KeyGenerator.getInstance(Algorithm.AES);
             keyGen.init(keySize);
             SecretKey secretKey = keyGen.generateKey();
-
-            // Encode the key to a string format
-            String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-            return encodedKey;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error generating key!";
+            return secretKey;
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException("Error during AES key generation", ex);
         }
     }
 
     public String getAesKey() {
-        return aesKey;
+        return Base64.getEncoder().encodeToString(aesKey.getEncoded());
     }
 
-    private String getDesktopDirectory() {
-        String home = System.getProperty("user.home");
-        return home + "/Desktop/";
+    public String getFileExtension() {
+        return fileExtension;
+    }
+
+    public static SecretKey convertStringToSecretKey(String encodedKeyString) {
+        byte[] decodedKey = Base64.getDecoder().decode(encodedKeyString);
+        return new SecretKeySpec(decodedKey, 0, decodedKey.length, Algorithm.AES);
     }
 }
