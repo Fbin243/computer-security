@@ -42,7 +42,9 @@ public class EncryptForm extends Form {
         }
 
         String inputFile = selectedFileForm.getAbsolutePath();
-        String aesCFile = FileGenerator.generateUniqueString() + Common.AES_FILE_EXTENSION;
+        String AESPhaseFileName = FileGenerator.generateUniqueString();
+        String aesCFile = AESPhaseFileName + Common.AES_FILE_EXTENSION;
+        String extensionInfoFileName = AESPhaseFileName + Common.INFO_FILE_EXTENSION;
         String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_PRIVATE_FILE_EXTENSION;
         String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
 
@@ -53,16 +55,16 @@ public class EncryptForm extends Form {
 
         try {
             byte[] hashedAESKey = aes.encrypt(inputFile);
-            Path outputPath = Paths.get(Common.USER_PATH + aesCFile);
+            Path hashFilePath = Paths.get(Common.USER_PATH + aesCFile);
+            Path infoFileExtensionPath = Paths.get(Common.USER_PATH + extensionInfoFileName);
+
 
             // bw.write(Helpers.getFileExtension(inputFile) + "\n");
             // Files.write(outputPath, Helpers.getFileExtension(inputFile) + "\n", StandardOpenOption.CREATE);
-            // try (BufferedWriter bw = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE)) {
-            //     bw.write(Helpers.getFileExtension(inputFile) + "\n");
-            // }
-            Files.write(outputPath, hashedAESKey, StandardOpenOption.CREATE);
-
-            // bw.write(hashedAESKey);
+            try (BufferedWriter bw = Files.newBufferedWriter(infoFileExtensionPath, StandardOpenOption.CREATE)) {
+                bw.write(Helpers.getFileExtension(inputFile) + "\n");
+            }
+            Files.write(hashFilePath, hashedAESKey, StandardOpenOption.CREATE);
 
             System.out.println("Ks key: " + aes.getAesKey());
             System.out.println("File: " + aesCFile);

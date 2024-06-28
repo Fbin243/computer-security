@@ -69,7 +69,7 @@ public class DecryptForm extends Form {
         // Decrypt the file using AES - Tuan
         try {
             AES aes = new AES();
-            byte[] decryptedBytes = aes.decrypt("V5+Mi8gtDOBNDDuGd0/jaw==",
+            byte[] decryptedBytes = aes.decrypt("80QT5AQpVmoOt5XkyZJi4Q==",
                     super.selectedFileForm.getAbsolutePath());
 
             String exportedFileName = Common.USER_PATH +
@@ -77,14 +77,6 @@ public class DecryptForm extends Form {
                     + Helpers.getFileName(super.selectedFileForm.getName()) + "." + aes.getFileExtension();
 
             Files.write(Paths.get(exportedFileName), decryptedBytes, StandardOpenOption.CREATE);
-
-            // try (BufferedWriter bw = new BufferedWriter(new FileWriter(exportedFileName))) {
-            //     bw.write(plainText);
-            //     System.out.println("Decryption successful.");
-            // } catch (IOException internalEx) {
-            //     internalEx.printStackTrace();
-            //     throw new IOException("Error during file export", internalEx);
-            // }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Decryption failed.");
