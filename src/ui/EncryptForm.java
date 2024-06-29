@@ -18,7 +18,7 @@ import utils.Helpers;
 public class EncryptForm extends Form {
     private String aesCFile;
     private String kPrivateKFile;
-    private CryptoSystem crypto;
+    private final CryptoSystem crypto;
 
     public EncryptForm(CryptoSystem cryptoSystem) {
         super();
@@ -71,6 +71,7 @@ public class EncryptForm extends Form {
             // Step 1: Generate AES key and encrypt file
             crypto.aes.generateKey(128);
             byte[] hashedAESKey = crypto.aes.encrypt(inputFile);
+            System.out.println("Ks key (encryption): " + crypto.aes.getAesKey());
             Path hashFilePath = Paths.get(selectedFileForm.getParent() + "/" + aesCFile);
             Path infoFileExtensionPath = Paths.get(Common.SYSTEM_PATH + "/" + extensionInfoFileName);
 
@@ -90,6 +91,7 @@ public class EncryptForm extends Form {
 
             // Step 4: RSA encrypt Ks with public key to get Kx
             String encryptedAesKey = crypto.rsa.encrypt(crypto.aes.getAesKey());
+            System.out.println("Kx key: " + encryptedAesKey);
 
             // Step 5: SHA hash private key and save with Kx to ./system
             String hashedPrivateKey = crypto.sha1.hash(crypto.rsa.getPrivateKey());
@@ -101,7 +103,7 @@ public class EncryptForm extends Form {
 
         try (BufferedWriter bw = new BufferedWriter(
                 new FileWriter(selectedFileForm.getParent() + "/" + kPrivateKFile, false))) {
-            // Step 6: Save private key to ./user
+            // Step 6: Save private key to the folder that user selected
             bw.write(crypto.rsa.getPrivateKey());
         } catch (Exception ex) {
             ex.printStackTrace();
