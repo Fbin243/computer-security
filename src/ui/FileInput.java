@@ -1,19 +1,13 @@
 package ui;
 
+import constants.Common;
 import interfaces.IFileInputEvent;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.io.File;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.io.File;
 
 public class FileInput {
 	private final JButton fileInputDialogButton;
@@ -65,6 +59,10 @@ public class FileInput {
 
 	private void handleShowFileDialogButton() {
 		fileDialog = new JFileChooser();
+		String currentDirectoryPath = System.getProperty(Common.USER_PATH);
+		File currentDirectory = new File(currentDirectoryPath);
+		fileDialog.setCurrentDirectory(currentDirectory);
+
 		fileInputDialogButton.addActionListener(e -> {
 			fileDialog.setDialogTitle("Choose a file to open");
 			int returnVal = fileDialog.showOpenDialog(null);

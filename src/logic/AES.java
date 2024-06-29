@@ -2,31 +2,24 @@ package logic;
 
 import constants.Algorithm;
 import constants.Common;
-import utils.FileGenerator;
 import utils.Helpers;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
 public class AES {
     private String fileExtension = "";
-    private final SecretKey aesKey;
-
-    public AES() {
-        this.aesKey = generateKsKey(128);
-    }
+    private SecretKey aesKey;
 
     public byte[] encrypt(String inputFile) throws Exception {
         Cipher cipher = Cipher.getInstance(Algorithm.AES);
@@ -63,12 +56,12 @@ public class AES {
         return decryptedBytes;
     }
 
-    public SecretKey generateKsKey(int keySize) {
+    public void generateKey(int keySize) {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(Algorithm.AES);
             keyGen.init(keySize);
             SecretKey secretKey = keyGen.generateKey();
-            return secretKey;
+            this.aesKey = secretKey;
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException("Error during AES key generation", ex);
         }
