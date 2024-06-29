@@ -3,6 +3,10 @@ package ui;
 import java.awt.Dimension;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.swing.Box;
 
@@ -38,7 +42,9 @@ public class EncryptForm extends Form {
         }
 
         String inputFile = selectedFileForm.getAbsolutePath();
-        String aesCFile = FileGenerator.generateUniqueString() + Common.AES_FILE_EXTENSION;
+        String AESPhaseFileName = FileGenerator.generateUniqueString();
+        String aesCFile = AESPhaseFileName + Common.AES_FILE_EXTENSION;
+        String extensionInfoFileName = AESPhaseFileName + Common.INFO_FILE_EXTENSION;
         String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_PRIVATE_FILE_EXTENSION;
         String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
 
@@ -47,16 +53,22 @@ public class EncryptForm extends Form {
         RSA rsa = new RSA();
         SHA sha = new SHA(Algorithm.SHA1);
 
-        try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.USER_PATH + aesCFile, false))) {
-            // Step 2: AES encrypt file with Ks to get file C and save to ./user
-            String hashedAESKey = aes.encrypt(inputFile);
-            bw.write(Helpers.getFileExtension(inputFile) + "\n");
-            bw.write(hashedAESKey);
+        try {
+            byte[] hashedAESKey = aes.encrypt(inputFile);
+            Path hashFilePath = Paths.get(Common.USER_PATH + aesCFile);
+            Path infoFileExtensionPath = Paths.get(Common.USER_PATH + extensionInfoFileName);
+
+
+            // bw.write(Helpers.getFileExtension(inputFile) + "\n");
+            // Files.write(outputPath, Helpers.getFileExtension(inputFile) + "\n", StandardOpenOption.CREATE);
+            try (BufferedWriter bw = Files.newBufferedWriter(infoFileExtensionPath, StandardOpenOption.CREATE)) {
+                bw.write(Helpers.getFileExtension(inputFile) + "\n");
+            }
+            Files.write(hashFilePath, hashedAESKey, StandardOpenOption.CREATE);
+
             System.out.println("Ks key: " + aes.getAesKey());
             System.out.println("File: " + aesCFile);
             System.out.println("AES Key encrypted successfully.");
-
 
         } catch (Exception ex) {
             ex.printStackTrace();

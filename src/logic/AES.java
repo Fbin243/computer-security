@@ -1,7 +1,9 @@
 package logic;
 
 import constants.Algorithm;
+import constants.Common;
 import utils.FileGenerator;
+import utils.Helpers;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -16,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 public class AES {
     private String fileExtension = "";
@@ -25,52 +28,39 @@ public class AES {
         this.aesKey = generateKsKey(128);
     }
 
-    public String encrypt(String inputFile) throws Exception {
+    public byte[] encrypt(String inputFile) throws Exception {
         Cipher cipher = Cipher.getInstance(Algorithm.AES);
         cipher.init(Cipher.ENCRYPT_MODE, this.aesKey);
 
         try {
-            String plainText = new String(Files.readAllBytes(Paths.get(inputFile)));
+            byte[] fileBytes = Files.readAllBytes(Paths.get(inputFile));
+            byte[] cipherBytes = cipher.doFinal(fileBytes);
 
-            byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-
-            return Base64.getEncoder().encodeToString(cipherText);
+            return cipherBytes;
         } catch (IOException ex) {
             throw new RuntimeException("Error during AES crypto", ex);
         }
     }
 
-    public String decrypt(String KsKey, String inputFile) throws Exception {
-        Path path = Paths.get(inputFile);
+    public byte[] decrypt(String KsKey, String inputFile) throws Exception {
+        Path encryptedPath = Paths.get(inputFile);
+        Path infoPath = Paths.get(Helpers.getFileName(inputFile) + Common.INFO_FILE_EXTENSION);
 
-        if (!Files.exists(path)) {
+        if (!Files.exists(encryptedPath)) {
             throw new RuntimeException("File not found: " + inputFile);
         }
 
         SecretKey secretKey = convertStringToSecretKey(KsKey);
         Cipher cipher = Cipher.getInstance(Algorithm.AES);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        String cipherText;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
-            fileExtension = br.readLine();
-            cipherText = br.readLine();
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        byte[] readBytes = Files.readAllBytes(encryptedPath);
+        byte[] decryptedBytes = cipher.doFinal(readBytes);
 
-            return new String(decryptedBytes);
-        } catch (IOException ex) {
-            throw new RuntimeException("Error during AES crypto", ex);
-        } catch (Exception ex) {
-            throw new RuntimeException("Error during decryption", ex);
-        }
-        // try {
-        //     String cipherText = new String(Files.readAllBytes(path));
-        //     byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-        //
-        //     return new String(decryptedBytes);
-        // } catch (IOException ex) {
-        //     throw new RuntimeException("Error during AES crypto", ex);
-        // }
+        List<String> lines = Files.readAllLines(infoPath, StandardCharsets.UTF_8);
+        fileExtension = lines.get(0);
+
+        return decryptedBytes;
     }
 
     public SecretKey generateKsKey(int keySize) {

@@ -26,5 +26,4 @@ public class Helpers {
             return fileName.substring(0, lastDotIndex);
         }
     }
-
 }
