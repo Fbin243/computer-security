@@ -1,7 +1,9 @@
+import logic.CryptoSystem;
 import ui.GUI;
 
 public class Main {
     public static void main(String[] args) {
-        GUI.initGUI();
+        CryptoSystem cryptoSystem = new CryptoSystem();
+        GUI.initGUI(cryptoSystem);
     }
 }

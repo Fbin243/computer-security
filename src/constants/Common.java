@@ -8,4 +8,5 @@ public class Common {
     public static final String AES_FILE_EXTENSION = ".aes";
     public static final String K_PRIVATE_FILE_EXTENSION = ".pem";
     public static final String INFO_FILE_EXTENSION = ".txt";
+    public static final int UUID_LENGTH = 8;
 }
