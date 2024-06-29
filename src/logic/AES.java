@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,9 +36,11 @@ public class AES {
         }
     }
 
-    public byte[] decrypt(String KsKey, String inputFile) throws Exception {
-        Path encryptedPath = Paths.get(inputFile);
-        Path infoPath = Paths.get(Helpers.getFileName(inputFile) + Common.INFO_FILE_EXTENSION);
+    public byte[] decrypt(String KsKey, File inputFile) throws Exception {
+        String inputPath = inputFile.getAbsolutePath();
+        Path encryptedPath = Paths.get(inputPath);
+        Path infoPath = Paths.get(Common.SYSTEM_PATH +
+                Helpers.getFileName(inputFile.getName()) + Common.INFO_FILE_EXTENSION);
 
         if (!Files.exists(encryptedPath)) {
             throw new RuntimeException("File not found: " + inputFile);

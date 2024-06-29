@@ -58,10 +58,8 @@ public class EncryptForm extends Form {
             aes.generateKey(128);
             byte[] hashedAESKey = aes.encrypt(inputFile);
             Path hashFilePath = Paths.get(selectedFileForm.getParent() + "/" + aesCFile);
-            Path infoFileExtensionPath = Paths.get(selectedFileForm.getParent() + "/" + extensionInfoFileName);
+            Path infoFileExtensionPath = Paths.get(Common.SYSTEM_PATH + "/" + extensionInfoFileName);
 
-            // bw.write(Helpers.getFileExtension(inputFile) + "\n");
-            // Files.write(outputPath, Helpers.getFileExtension(inputFile) + "\n", StandardOpenOption.CREATE);
             try (BufferedWriter bw = Files.newBufferedWriter(infoFileExtensionPath, StandardOpenOption.CREATE)) {
                 bw.write(Helpers.getFileExtension(inputFile) + "\n");
             }
