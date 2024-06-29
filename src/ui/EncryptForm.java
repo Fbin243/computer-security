@@ -1,15 +1,5 @@
 package ui;
 
-import java.awt.Dimension;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
-import javax.swing.Box;
-
 import constants.Algorithm;
 import constants.Common;
 import logic.AES;
@@ -17,6 +7,15 @@ import logic.RSA;
 import logic.SHA;
 import utils.FileGenerator;
 import utils.Helpers;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class EncryptForm extends Form {
     public EncryptForm() {
@@ -42,22 +41,24 @@ public class EncryptForm extends Form {
         }
 
         String inputFile = selectedFileForm.getAbsolutePath();
-        String AESPhaseFileName = FileGenerator.generateUniqueString();
-        String aesCFile = AESPhaseFileName + Common.AES_FILE_EXTENSION;
-        String extensionInfoFileName = AESPhaseFileName + Common.INFO_FILE_EXTENSION;
-        String kPrivateKFile = FileGenerator.generateUniqueString() + Common.K_PRIVATE_FILE_EXTENSION;
-        String systemMetadataFileName = FileGenerator.generateUniqueString() + Common.METADATA_EXTENSION;
+        String inputFileName = selectedFileForm.getName();
+        String fileNameUID = "-" + FileGenerator.generateUniqueString();
 
-        // Step 1: AES generate key Ks
+        String aesCFile = inputFileName + fileNameUID + Common.AES_FILE_EXTENSION;
+        String kPrivateKFile = inputFileName + fileNameUID + Common.K_PRIVATE_FILE_EXTENSION;
+        String extensionInfoFileName = inputFileName + fileNameUID + Common.INFO_FILE_EXTENSION;
+        String systemMetadataFileName = inputFileName + fileNameUID + Common.METADATA_EXTENSION;
+
         AES aes = new AES();
         RSA rsa = new RSA();
         SHA sha = new SHA(Algorithm.SHA1);
 
         try {
+            // Step 1: Generate AES key and encrypt file
+            aes.generateKey(128);
             byte[] hashedAESKey = aes.encrypt(inputFile);
-            Path hashFilePath = Paths.get(Common.USER_PATH + aesCFile);
-            Path infoFileExtensionPath = Paths.get(Common.USER_PATH + extensionInfoFileName);
-
+            Path hashFilePath = Paths.get(selectedFileForm.getParent() + "/" + aesCFile);
+            Path infoFileExtensionPath = Paths.get(selectedFileForm.getParent() + "/" + extensionInfoFileName);
 
             // bw.write(Helpers.getFileExtension(inputFile) + "\n");
             // Files.write(outputPath, Helpers.getFileExtension(inputFile) + "\n", StandardOpenOption.CREATE);
@@ -94,7 +95,7 @@ public class EncryptForm extends Form {
         }
 
         try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(Common.USER_PATH + kPrivateKFile, false))) {
+                new FileWriter(selectedFileForm.getParent() + "/" + kPrivateKFile, false))){
             // Step 6: Save private key to ./user
             bw.write(rsa.getPrivateKey());
             System.out.println("File K-private stored.");
