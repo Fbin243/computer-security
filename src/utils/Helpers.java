@@ -21,7 +21,7 @@ public class Helpers {
 
         int lastDotIndex = fileName.lastIndexOf('.');
         if (lastDotIndex == -1) {
-            return fileName; // No extension found
+            return fileName;
         } else {
             return fileName.substring(0, lastDotIndex);
         }
