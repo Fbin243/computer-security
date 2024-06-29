@@ -1,13 +1,20 @@
 package ui;
 
-import constants.Common;
-import interfaces.IFileInputEvent;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.io.File;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import java.awt.*;
-import java.io.File;
+
+import constants.Common;
+import interfaces.IFileInputEvent;
 
 public class FileInput {
 	private final JButton fileInputDialogButton;
@@ -77,5 +84,10 @@ public class FileInput {
 				fileInputStatusLabel.setText("No File Chosen");
 			}
 		});
+	}
+
+	public void resetFileDialog() {
+		fileDialog.setSelectedFile(null);
+		fileInputStatusLabel.setText("No File Chosen");
 	}
 }
