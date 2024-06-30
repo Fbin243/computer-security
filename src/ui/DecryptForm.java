@@ -84,6 +84,7 @@ public class DecryptForm extends Form {
 
 			// Step 3: Decrypt Kx to get Ks by using RSA
 			String Ks = crypto.rsa.decrypt(Kx);
+			System.out.println("Ks key (decryption): " + Ks);
 
 			// Step 4: Decrypt the file using Ks by using AES
 			byte[] decryptedBytes = crypto.aes.decrypt(Ks,
